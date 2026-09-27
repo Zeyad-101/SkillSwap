@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Scratch / temp files
+scratch*.js
+fix_imports.cjs
+generate-icons.js
+skillswap-merge-conflict-fix.patch
+spec.json
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
