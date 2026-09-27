@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getProfile, updateProfile } from '../api/profiles.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { supabase } from '../lib/supabaseClient.js'
 import SkillTag from '../components/SkillTag.jsx'
 import Button from '../components/Button.jsx'
 
@@ -13,6 +14,8 @@ export default function Profile() {
   const [profile, setProfile] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const fileInputRef = useRef(null)
   
   const isOwnProfile = user?.id === userId
 
@@ -49,6 +52,26 @@ export default function Profile() {
       })
   }, [userId])
 
+  async function handleAvatarUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    setAvatarUploading(true)
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${user.id}/avatar.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      setEditForm(prev => ({ ...prev, avatar: data.publicUrl }))
+    } catch (err) {
+      console.error('Avatar upload failed:', err)
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
+
   async function handleSaveProfile() {
     if (!isOwnProfile) return
     try {
@@ -79,11 +102,32 @@ export default function Profile() {
       </div>
 
       <div className="-mt-12 flex items-end gap-4 px-2">
-        <img
-          src={isEditing ? editForm.avatar : profile.avatar}
-          alt={isEditing ? editForm.name : profile.name}
-          className="h-24 w-24 rounded-full border-4 border-white object-cover"
-        />
+        <div className="relative h-24 w-24 shrink-0">
+          <img
+            src={isEditing ? editForm.avatar : profile.avatar}
+            alt={isEditing ? editForm.name : profile.name}
+            className="h-24 w-24 rounded-full border-4 border-white object-cover"
+          />
+          {isEditing && (
+            <>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 text-white text-xs font-semibold opacity-0 hover:opacity-100 transition-opacity disabled:opacity-100"
+              >
+                {avatarUploading ? '...' : '📷 Change'}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+            </>
+          )}
+        </div>
         <div className="pb-1 w-full max-w-sm">
           {isEditing ? (
             <div className="space-y-2">
@@ -93,12 +137,9 @@ export default function Profile() {
                 className="min-h-[44px] w-full rounded-lg border border-brand-200 px-3 py-1.5 text-lg font-bold focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
                 placeholder="Your Name"
               />
-              <input
-                value={editForm.avatar}
-                onChange={(e) => setEditForm({ ...editForm, avatar: e.target.value })}
-                className="min-h-[44px] w-full rounded-lg border border-brand-200 px-3 py-1.5 text-sm focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
-                placeholder="Avatar URL"
-              />
+              {avatarUploading && (
+                <p className="text-xs text-brand-500">Uploading photo...</p>
+              )}
             </div>
           ) : (
             <>

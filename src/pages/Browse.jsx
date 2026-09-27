@@ -23,6 +23,7 @@ export default function Browse() {
   const navigate = useNavigate()
   const [category, setCategory] = useState('All Skills')
   const [searchQuery, setSearchQuery] = useState('')
+  const [location, setLocation] = useState('')
   const [swappers, setSwappers] = useState([])
   const [matches, setMatches] = useState([])
 
@@ -111,13 +112,34 @@ export default function Browse() {
           </div>
 
           <div className="mt-5">
-            <p className="text-xs font-semibold text-brand-900/60">
-              {user ? 'Location / Distance' : 'Location'}
-            </p>
-            <input
-              defaultValue="Seattle, WA"
+            <p className="text-xs font-semibold text-brand-900/60">Location</p>
+            <select
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
               className="min-h-[44px] mt-1.5 w-full rounded-lg border border-brand-100 px-3 py-2 text-sm focus:border-brand-400 focus:outline-none"
-            />
+            >
+              <option value="">All of Egypt</option>
+              <option>Cairo</option>
+              <option>Giza</option>
+              <option>Alexandria</option>
+              <option>Sharm El-Sheikh</option>
+              <option>Hurghada</option>
+              <option>Luxor</option>
+              <option>Aswan</option>
+              <option>Mansoura</option>
+              <option>Tanta</option>
+              <option>Zagazig</option>
+              <option>Ismailia</option>
+              <option>Suez</option>
+              <option>Port Said</option>
+              <option>Damietta</option>
+              <option>Minya</option>
+              <option>Sohag</option>
+              <option>Qena</option>
+              <option>Beni Suef</option>
+              <option>Fayoum</option>
+              <option>Asyut</option>
+            </select>
           </div>
 
           <button
