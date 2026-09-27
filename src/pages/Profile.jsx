@@ -18,6 +18,7 @@ export default function Profile() {
   const [avatarUploading, setAvatarUploading] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
   const fileInputRef = useRef(null)
   
   const isOwnProfile = user?.id === userId
@@ -79,13 +80,14 @@ export default function Profile() {
   async function handleDeleteProfile() {
     if (!isOwnProfile) return
     setDeleting(true)
+    setDeleteError(null)
     try {
       await deleteProfile(user.id)
       navigate('/', { replace: true })
     } catch (err) {
       console.error('Delete failed:', err)
+      setDeleteError(err.message ?? 'Delete failed. Check console for details.')
       setDeleting(false)
-      setShowDeleteModal(false)
     }
   }
 
@@ -258,6 +260,9 @@ export default function Profile() {
             <p className="mt-2 text-sm text-brand-900/70">
               This will erase all your profile data and sign you out. This action <strong>cannot be undone</strong>.
             </p>
+            {deleteError && (
+              <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{deleteError}</p>
+            )}
             <div className="mt-6 flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
