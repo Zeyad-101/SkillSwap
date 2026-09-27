@@ -68,16 +68,20 @@ export default function Onboarding() {
     setCustomLearn('')
   }
 
+  const [error, setError] = useState(null)
+
   async function handleFinish() {
     setLoading(true)
+    setError(null)
     try {
       await updateProfile(user.id, {
         can_teach_categories: canTeach,
         wants_to_learn_categories: wantsToLearn
       })
       navigate('/dashboard', { replace: true })
-    } catch (error) {
-      console.error(error)
+    } catch (err) {
+      console.error(err)
+      setError(err.message ?? 'Something went wrong. Please try again.')
       setLoading(false)
     }
   }
@@ -175,9 +179,14 @@ export default function Onboarding() {
               <Button variant="secondary" onClick={handleAddCustomLearn}>Add</Button>
             </div>
             
-            <div className="mt-10 flex justify-between">
-              <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>
-              <Button onClick={handleFinish}>Complete Setup</Button>
+            <div className="mt-10 flex flex-col gap-3">
+              {error && (
+                <p className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-600">{error}</p>
+              )}
+              <div className="flex justify-between">
+                <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>
+                <Button onClick={handleFinish}>Complete Setup</Button>
+              </div>
             </div>
           </div>
         )}
