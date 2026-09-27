@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <p align="center">
   <img src="src/assets/logo/logo.png" alt="SkillSwap logo" width="140" />
 </p>
@@ -145,6 +144,3 @@ This project is split by ownership:
 - **Frontend:** all React pages and components, consuming the API contract above
 
 Changes to the database schema should be coordinated between both sides rather than made unilaterally, since the frontend's `api/*.js` layer assumes a fixed table and column shape.
-=======
-# SkillSwap
->>>>>>> 548b36d6c00c38b3c5310bdcec693d67f8af1a37

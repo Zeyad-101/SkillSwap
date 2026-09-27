@@ -1,0 +1,59 @@
+diff --git a/README.md b/README.md
+index 0ba4e15..c6db2fa 100644
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,3 @@
+-<<<<<<< HEAD
+ <p align="center">
+   <img src="src/assets/logo/logo.png" alt="SkillSwap logo" width="140" />
+ </p>
+@@ -145,6 +144,3 @@ This project is split by ownership:
+ - **Frontend:** all React pages and components, consuming the API contract above
+ 
+ Changes to the database schema should be coordinated between both sides rather than made unilaterally, since the frontend's `api/*.js` layer assumes a fixed table and column shape.
+-=======
+-# SkillSwap
+->>>>>>> 548b36d6c00c38b3c5310bdcec693d67f8af1a37
+diff --git a/index.html b/index.html
+index 359039d..fe797d8 100644
+--- a/index.html
++++ b/index.html
+@@ -9,15 +9,12 @@
+       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+       rel="stylesheet"
+     />
+-<<<<<<< HEAD
+     <link rel="icon" type="image/png" href="/src/assets/logo/logo.png" />
+     <link rel="manifest" href="/manifest.json" />
+     <meta name="theme-color" content="#e91e86" />
+     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+     <meta name="apple-mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+-=======
+->>>>>>> 548b36d6c00c38b3c5310bdcec693d67f8af1a37
+     <title>SkillSwap</title>
+   </head>
+   <body>
+diff --git a/vite.config.js b/vite.config.js
+index 72271d7..cc0ab40 100644
+--- a/vite.config.js
++++ b/vite.config.js
+@@ -1,6 +1,5 @@
+ import { defineConfig } from 'vite'
+ import react from '@vitejs/plugin-react'
+-<<<<<<< HEAD
+ import { VitePWA } from 'vite-plugin-pwa'
+ 
+ export default defineConfig({
+@@ -41,11 +40,6 @@ export default defineConfig({
+       }
+     })
+   ],
+-=======
+-
+-export default defineConfig({
+-  plugins: [react()],
+->>>>>>> 548b36d6c00c38b3c5310bdcec693d67f8af1a37
+   server: {
+     port: 5173,
+   },
