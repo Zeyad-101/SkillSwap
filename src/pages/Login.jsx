@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import { getProfile } from '../api/profiles.js'
 import Button from '../components/Button.jsx'
 import logo from '../assets/logo/logo.png'
 
@@ -15,13 +16,23 @@ export default function Login() {
 
   const redirectTo = location.state?.from?.pathname ?? '/dashboard'
 
+  async function goAfterLogin(userId) {
+    try {
+      const profile = await getProfile(userId)
+      const hasOnboarded = profile?.can_teach_categories?.length > 0 || profile?.wants_to_learn_categories?.length > 0
+      navigate(hasOnboarded ? redirectTo : '/onboarding', { replace: true })
+    } catch {
+      navigate('/onboarding', { replace: true })
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
     setSubmitting(true)
     try {
-      await signInWithPassword(email, password)
-      navigate(redirectTo, { replace: true })
+      const { user } = await signInWithPassword(email, password)
+      await goAfterLogin(user.id)
     } catch (err) {
       setError(err.message ?? 'Could not sign in. Check your details and try again.')
     } finally {
