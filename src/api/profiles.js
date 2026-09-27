@@ -22,4 +22,21 @@ export async function updateProfile(userId, updates) {
   return data
 }
 
+export async function deleteProfile(userId) {
+  // Clear all profile data first
+  const { error: updateError } = await supabase
+    .from('profiles')
+    .update({
+      name: null,
+      about: null,
+      avatar_url: null,
+      can_teach_categories: [],
+      wants_to_learn_categories: [],
+    })
+    .eq('id', userId)
 
+  if (updateError) throw updateError
+
+  // Sign the user out — full account deletion requires a server-side edge function
+  await supabase.auth.signOut()
+}

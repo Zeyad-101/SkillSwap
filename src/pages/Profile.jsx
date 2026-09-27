@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getProfile, updateProfile } from '../api/profiles.js'
+import { useNavigate, useParams } from 'react-router-dom'
+import { getProfile, updateProfile, deleteProfile } from '../api/profiles.js'
 import { useAuth } from '../context/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient.js'
 import SkillTag from '../components/SkillTag.jsx'
@@ -11,15 +11,19 @@ const FALLBACK_PROFILE = null
 export default function Profile() {
   const { userId } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editForm, setEditForm] = useState(null)
   const [avatarUploading, setAvatarUploading] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const fileInputRef = useRef(null)
   
   const isOwnProfile = user?.id === userId
 
   const [loading, setLoading] = useState(true)
+
 
   useEffect(() => {
     getProfile(userId)
@@ -69,6 +73,19 @@ export default function Profile() {
       console.error('Avatar upload failed:', err)
     } finally {
       setAvatarUploading(false)
+    }
+  }
+
+  async function handleDeleteProfile() {
+    if (!isOwnProfile) return
+    setDeleting(true)
+    try {
+      await deleteProfile(user.id)
+      navigate('/', { replace: true })
+    } catch (err) {
+      console.error('Delete failed:', err)
+      setDeleting(false)
+      setShowDeleteModal(false)
     }
   }
 
@@ -161,8 +178,22 @@ export default function Profile() {
           <div className="rounded-2xl border border-brand-100 p-6">
             <div className="flex justify-between items-center">
               <h2 className="font-bold text-brand-600">About Me</h2>
-              {isOwnProfile && !isEditing && <Button size="sm" variant="secondary" onClick={() => setIsEditing(true)}>Edit Profile</Button>}
-              {isEditing && <Button size="sm" onClick={handleSaveProfile}>Save Changes</Button>}
+              <div className="flex items-center gap-2">
+                {isOwnProfile && !isEditing && (
+                  <Button size="sm" variant="secondary" onClick={() => setIsEditing(true)}>Edit Profile</Button>
+                )}
+                {isEditing && (
+                  <Button size="sm" onClick={handleSaveProfile}>Save Changes</Button>
+                )}
+                {isOwnProfile && !isEditing && (
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className="min-h-[36px] rounded-lg border border-red-200 px-3 py-1 text-sm font-medium text-red-500 transition-colors hover:bg-red-50"
+                  >
+                    Delete Profile
+                  </button>
+                )}
+              </div>
             </div>
             {isEditing ? (
               <textarea
@@ -218,6 +249,34 @@ export default function Profile() {
           </div>
 
       </div>
+
+      {/* Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-lg font-extrabold text-brand-900">Delete Profile?</h2>
+            <p className="mt-2 text-sm text-brand-900/70">
+              This will erase all your profile data and sign you out. This action <strong>cannot be undone</strong>.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+                className="min-h-[44px] rounded-lg border border-brand-200 px-4 py-2 text-sm font-medium text-brand-700 hover:bg-brand-50 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProfile}
+                disabled={deleting}
+                className="min-h-[44px] rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
